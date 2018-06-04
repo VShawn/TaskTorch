@@ -9,22 +9,34 @@ namespace TaskTorch.WinTaskHelper
     {
         private const string FolderName = nameof(TaskTorch);
 
-        private static string ExePath = System.Environment.CurrentDirectory.Replace(":", "").Replace("\\", "_")
+        private static readonly string ExePath = System.Environment.CurrentDirectory.Replace(":", "").Replace("\\", "_")
             .Replace("//", "_").Replace(@"\", "_").Replace("/", "_").Replace("?", "_").Replace("*", "_").Replace("\"", "_").Replace("<", "_").Replace(">", "_").Replace("|", "_");
 
-        private static object locker = new object();
 
 
+        /// <summary>
+        /// return a task name conbined with app name and exe path
+        /// </summary>
+        /// <returns></returns>
         private static string GetTaskFolderName()
         {
             return FolderName + "-on-" + ExePath;
         }
+
+
+        /// <summary>
+        /// a lock for thread safety
+        /// </summary>
+        private static readonly object Locker = new object();
+        /// <summary>
+        /// create new folder for this app in windows task scheduler.
+        /// </summary>
         private static void BuildFolder()
         {
             using (var ts = new TaskService())
             {
                 if (!ts.RootFolder.SubFolders.Exists(GetTaskFolderName()))
-                    lock (locker)
+                    lock (Locker)
                     {
                         try
                         {
@@ -40,7 +52,7 @@ namespace TaskTorch.WinTaskHelper
 
 
         /// <summary>
-        /// 列出本管理程序的所有计划任务
+        /// enum all task in windows task scheduler which is belong to this app. 
         /// </summary>
         /// <param name="folderName"></param>
         /// <returns></returns>
@@ -61,7 +73,7 @@ namespace TaskTorch.WinTaskHelper
         }
 
         /// <summary>
-        /// 检查某个计划任务是否存在
+        /// check if the 'taskName' is existed in windows task scheduler
         /// </summary>
         /// <param name="taskName"></param>
         /// <returns></returns>
@@ -80,8 +92,42 @@ namespace TaskTorch.WinTaskHelper
             return false;
         }
 
+        public static Task AddTmpTask<T>(string taskName, string taskDescription, string scriptName, T tigger,
+            string userName = null, string password = null) where T : Trigger
+        {
+            taskName = nameof(TaskTorch) + "_TmpTask_" + taskName;
+            // 检查runner是否存在
+            var runnerPath = System.Environment.CurrentDirectory + @"\" + nameof(TaskTorch) + "." + "Runner" + ".exe";
+            if (!File.Exists(runnerPath))
+                throw new FileNotFoundException("Runner.exe not existed: " + ExePath, runnerPath);
+
+            using (var ts = new TaskService())
+            {
+                if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+                    return ts.AddTask(taskName,
+                        new TimeTrigger()
+                        {
+                            StartBoundary = DateTime.Now + TimeSpan.FromHours(1),
+                            Enabled = false
+                        },
+                        new ExecAction(runnerPath, scriptName, null), null, null, TaskLogonType.InteractiveToken,
+                        taskDescription);
+                else
+                    return ts.AddTask(taskName,
+                        new TimeTrigger()
+                        {
+                            StartBoundary = DateTime.Now + TimeSpan.FromHours(1),
+                            Enabled = false
+                        },
+                        new ExecAction(runnerPath, scriptName, null), userName, password,
+                        TaskLogonType.InteractiveTokenOrPassword, taskDescription);
+            }
+
+            return null;
+        }
+
         /// <summary>
-        /// 添加一个计划任务
+        /// add a task in windows task scheduler for this app
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="taskName"></param>
@@ -89,28 +135,26 @@ namespace TaskTorch.WinTaskHelper
         /// <param name="scriptName"></param>
         /// <param name="tigger"></param>
         /// <returns></returns>
-        public static bool AddTask<T>(string taskName, string taskDescription, string scriptName, T tigger,string userName = "",string password = "") where T : Trigger
+        public static Task AddTask<T>(string taskName, string taskDescription, string scriptName, T tigger, string userName = "", string password = "") where T : Trigger
         {
             // 检查runner是否存在
-            string runnerPath = ExePath + @"\" + nameof(TaskTorch) + "." + "Runner" + ".exe";
+            var runnerPath = System.Environment.CurrentDirectory + @"\" + nameof(TaskTorch) + "." + "Runner" + ".exe";
             if (!File.Exists(runnerPath))
-                throw new FileNotFoundException("Runner.exe并不存在于路径" + ExePath, runnerPath);
+                throw new FileNotFoundException("Runner.exe not existed: " + ExePath, runnerPath);
 
             BuildFolder();
 
-            // 检查task是否存在
+            // check task
             if (TaskExists(taskName))
-                return false;
+                return null;
             using (var ts = new TaskService())
             {
                 var tf = ts.RootFolder.SubFolders[GetTaskFolderName()];
-                 
-                // 创建task
 
                 // Create a new task definition and assign properties
-                TaskDefinition td = ts.NewTask();
+                var td = ts.NewTask();
                 td.RegistrationInfo.Description = taskDescription;
-                td.Principal.LogonType = TaskLogonType.InteractiveTokenOrPassword;
+                td.Principal.LogonType = TaskLogonType.InteractiveToken;
 
                 // Add a trigger
                 td.Triggers.Add(tigger);
@@ -120,14 +164,35 @@ namespace TaskTorch.WinTaskHelper
 
 
                 if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
-                    tf.RegisterTaskDefinition(taskName, td);
+                    return tf.RegisterTaskDefinition(taskName, td);
                 else
-                    tf.RegisterTaskDefinition(taskName, td, TaskCreation.Create, userName, password,
+                    return tf.RegisterTaskDefinition(taskName, td, TaskCreation.Create, userName, password,
+                 TaskLogonType.InteractiveTokenOrPassword);
+            }
+        }
+        public static Task AddTask(string taskName, Task t, string userName = "", string password = "")
+        {
+            // 检查runner是否存在
+            var runnerPath = System.Environment.CurrentDirectory + @"\" + nameof(TaskTorch) + "." + "Runner" + ".exe";
+            if (!File.Exists(runnerPath))
+                throw new FileNotFoundException("Runner.exe not existed: " + ExePath, runnerPath);
+
+            BuildFolder();
+
+            // check 
+            if (TaskExists(taskName))
+                return null;
+            using (var ts = new TaskService())
+            {
+                var tf = ts.RootFolder.SubFolders[GetTaskFolderName()];
+
+                if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+                    return tf.RegisterTaskDefinition(taskName, t.Definition);
+                else
+                    return tf.RegisterTaskDefinition(taskName, t.Definition, TaskCreation.Create, userName, password,
                         TaskLogonType.InteractiveTokenOrPassword);
             }
-            return true;
         }
-
         public static void DeleteTask(string taskName)
         {
             // 检查task是否存在
@@ -137,6 +202,18 @@ namespace TaskTorch.WinTaskHelper
             using (var ts = new TaskService())
             {
                 var tf = ts.RootFolder.SubFolders[GetTaskFolderName()];
+                tf.DeleteTask(taskName, false);
+            }
+        }
+        public static void DeleteTmpTask(string taskName)
+        {
+            taskName = nameof(TaskTorch) + "_TmpTask_" + taskName;
+            // 检查task是否存在
+            if (TaskExists(taskName))
+                return;
+            using (var ts = new TaskService())
+            {
+                var tf = ts.RootFolder;
                 tf.DeleteTask(taskName, false);
             }
         }

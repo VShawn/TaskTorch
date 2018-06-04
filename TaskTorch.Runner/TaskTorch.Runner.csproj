@@ -94,5 +94,11 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TaskTorch.Loader\TaskTorch.Loader.csproj">
+      <Project>{940c0e07-82df-4e06-a718-40ca8df8fc73}</Project>
+      <Name>TaskTorch.Loader</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

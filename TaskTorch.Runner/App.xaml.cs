@@ -13,5 +13,13 @@ namespace TaskTorch.Runner
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            if (e.Args.Length > 0)
+            {
+                var window = new MainWindow(e.Args[0]);
+                window.Show();
+            }
+        }
     }
 }

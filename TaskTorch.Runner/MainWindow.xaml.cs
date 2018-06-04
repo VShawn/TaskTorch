@@ -1,5 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
+using TaskTorch.Loader.Model;
 
 namespace TaskTorch.Runner
 {
@@ -8,94 +11,63 @@ namespace TaskTorch.Runner
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(string taskName)
         {
             InitializeComponent();
-            RunCmd("ping 172.20.65.150");
-            RunPowershell("ping1 172.20.65.150");
+            //RunCmd("ping 172.20.65.150");
+            //RunPowershell("ping1 172.20.65.150");
+            RunTask(taskName);
         }
 
-        static string RunCmd(string cmd)
+        public void RunTask(string taskName)
         {
-            System.Diagnostics.Process pro = new System.Diagnostics.Process();
-            pro.StartInfo.FileName = "cmd.exe";
-            pro.StartInfo.UseShellExecute = false;
-            pro.StartInfo.RedirectStandardError = true;
-            pro.StartInfo.RedirectStandardInput = true;
-            pro.StartInfo.RedirectStandardOutput = true;
-            pro.StartInfo.CreateNoWindow = true;
-            //pro.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            pro.Start();
-            pro.StandardInput.WriteLine(cmd);
-            pro.StandardInput.WriteLine("exit");
-            pro.StandardInput.AutoFlush = true;
-            //获取cmd窗口的输出信息
-            string output = pro.StandardOutput.ReadToEnd();
-            pro.WaitForExit();//等待程序执行完退出进程
-            pro.Close();
-            return output;
-        }
-
-        static void RunPowershell(string cmd)
-        {
-            System.Diagnostics.Process pro = new System.Diagnostics.Process();
-            pro.StartInfo.FileName = "powershell.exe";
-            pro.StartInfo.UseShellExecute = false;
-            pro.StartInfo.RedirectStandardError = true;
-            pro.StartInfo.RedirectStandardInput = true;
-            pro.StartInfo.RedirectStandardOutput = true;
-            pro.StartInfo.CreateNoWindow = true;
-            //pro.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            pro.Start();
-            pro.OutputDataReceived += (sender, args) => { MessageBox.Show(args.Data); };
-
-            pro.BeginOutputReadLine();
-            pro.StandardInput.WriteLine(cmd);
-            pro.StandardInput.WriteLine("exit");
-            pro.StandardInput.AutoFlush = true;
-            //获取cmd窗口的输出信息
-            //string output = pro.StandardOutput.ReadToEnd();
-            pro.WaitForExit();//等待程序执行完退出进程
-            pro.Close();
-            //return output;
-        }
-
-        /// <summary>
-        /// 打开软件并执行命令
-        /// </summary>
-        /// <param name="programName">软件路径加名称（.exe文件）</param>
-        /// <param name="cmd">要执行的命令</param>
-        public void RunProgram(string programName, string cmd)
-        {
-            Process proc = new Process();
-            proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.FileName = programName;
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.RedirectStandardError = true;
-            proc.StartInfo.RedirectStandardInput = true;
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.Start();
-            if (cmd.Length != 0)
+            try
             {
-                proc.StandardInput.WriteLine(cmd);
+                var ymlPath = System.Environment.CurrentDirectory + "\\task\\" + taskName + "\\" + taskName + ".yml";
+                if (File.Exists(ymlPath))
+                {
+                    string yml = File.ReadAllText(ymlPath);
+                    var t = TaskSimpleFactory.CreateTask(yml);
+                    if (t == null)
+                        return;
+                    var result = t.Excute();
+
+                    // TODO 记录执行情况
+                    switch (result)
+                    {
+                        case TaskStatus.Failure:
+                            break;
+                        case TaskStatus.Success:
+                            break;
+                        case TaskStatus.Run:
+                            break;
+                        case TaskStatus.Exception:
+                            break;
+                        case TaskStatus.NotRun:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    var next = t.GetNexTaskName();
+                    if (string.IsNullOrEmpty(next))
+                        return;
+                    else if (next == taskName)
+                    {
+                        t.Excute();
+                    }
+                    else
+                    {
+                        RunTask(next);
+                    }
+                }
             }
-            proc.Close();
-        }
-        //
-
-
-        /// <summary>
-        /// 执行bat文件
-        /// </summary>
-        /// <param name="batName"></param>
-        static void LaunchBat(string batName)
-        {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = true;
-            startInfo.FileName = batName;
-            startInfo.WindowStyle = ProcessWindowStyle.Maximized;
-            Process.Start(startInfo);
-
+            catch (Exception e)
+            {
+                // TODO 记录异常
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }
