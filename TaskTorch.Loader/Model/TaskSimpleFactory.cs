@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using SharpYaml.Serialization;
+using YamlDotNet.RepresentationModel;
 
 namespace TaskTorch.Loader.Model
 {

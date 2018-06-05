@@ -35,11 +35,11 @@ namespace TaskTorch.app
                 SuccessFlag = TbSuccessFlagString.Text,
                 TaskAfterSuccess = TbTaskAfterSuccess.Text,
                 TaskAfterFailure = TbTaskAfterFailure.Text,
+                TaskType = TaskType.Cmd,
+                TaskCmd = TbScriptPath.Text,
             };
 
 
-            t.TaskType = TaskType.Cmd;
-            t.TaskCmd = TbDescription.Text;
             if (File.Exists(TbScriptPath.Text))
             {
                 FileInfo fi = new FileInfo(TbScriptPath.Text);
@@ -55,7 +55,6 @@ namespace TaskTorch.app
             {
                 // Create a new task int tmp folder
                 var taskName = t.TaskName;
-                WinTaskHelper.TaskHelper.DeleteTask(taskName);
                 WinTaskHelper.TaskHelper.DeleteTmpTask(taskName);
                 var task = WinTaskHelper.TaskHelper.AddTmpTask(taskName, t.TaskDescription, taskName, new TimeTrigger()
                 {
@@ -63,23 +62,26 @@ namespace TaskTorch.app
                     Enabled = false
                 });
                 // Edit task and re-register if user clicks Ok
-                TaskEditDialog editorForm = new TaskEditDialog();
-                editorForm.Editable = true;
-                editorForm.AvailableTabs = AvailableTaskTabs.General | AvailableTaskTabs.Triggers |
-                                           AvailableTaskTabs.Conditions | AvailableTaskTabs.Settings |
-                                           AvailableTaskTabs.Properties;
-                editorForm.RegisterTaskOnAccept = false;
+                var editorForm = new TaskEditDialog
+                {
+                    Editable = true,
+                    AvailableTabs = AvailableTaskTabs.General | AvailableTaskTabs.Triggers |
+                                    AvailableTaskTabs.Conditions | AvailableTaskTabs.Settings |
+                                    AvailableTaskTabs.Properties,
+                    RegisterTaskOnAccept = false
+                };
                 editorForm.Initialize(task);
                 //editorForm.Initialize(ts);
                 // ** The four lines above can be replaced by using the full constructor
                 // TaskEditDialog editorForm = new TaskEditDialog(t, true, true);
                 if (editorForm.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    // if ok, move task to storage folder
+                    // if ok, move tmp task to storage folder
                     if (!Directory.Exists(System.Environment.CurrentDirectory + "\\tasks\\" + taskName))
                         Directory.CreateDirectory(System.Environment.CurrentDirectory + "\\tasks\\" + taskName);
                     string ymlstr = t.ToYmlString();
-                    File.WriteAllText(System.Environment.CurrentDirectory + "\\tasks\\" + taskName + "\\" + taskName + ".ylm", ymlstr);
+                    File.WriteAllText(System.Environment.CurrentDirectory + "\\tasks\\" + taskName + "\\" + taskName + ".yml", ymlstr);
+                    WinTaskHelper.TaskHelper.DeleteTask(taskName);
                     WinTaskHelper.TaskHelper.AddTask(taskName, task);
                     WinTaskHelper.TaskHelper.DeleteTmpTask(taskName);
                 }

@@ -20,6 +20,7 @@ namespace TaskTorch.Runner
                 var window = new MainWindow(e.Args[0]);
                 window.Show();
             }
+            Environment.Exit(0);
         }
     }
 }

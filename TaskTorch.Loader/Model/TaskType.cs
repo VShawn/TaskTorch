@@ -9,7 +9,6 @@
     public enum TaskStatus
     {
         NotRun = 0,
-        Run,
         Success,
         Failure,
         Exception,

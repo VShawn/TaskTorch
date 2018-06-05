@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using TaskTorch.Loader.Model;
 
@@ -23,48 +24,40 @@ namespace TaskTorch.Runner
         {
             try
             {
-                var ymlPath = System.Environment.CurrentDirectory + "\\task\\" + taskName + "\\" + taskName + ".yml";
+                var ymlPath = System.Environment.CurrentDirectory + "\\tasks\\" + taskName + "\\" + taskName + ".yml";
                 if (File.Exists(ymlPath))
                 {
-                    string yml = File.ReadAllText(ymlPath);
+                    var yml = File.ReadAllText(ymlPath);
                     var t = TaskSimpleFactory.CreateTask(yml);
                     if (t == null)
                         return;
                     var result = t.Excute();
 
-                    // TODO 记录执行情况
-                    switch (result)
+                    if (result == TaskStatus.Failure)
                     {
-                        case TaskStatus.Failure:
-                            break;
-                        case TaskStatus.Success:
-                            break;
-                        case TaskStatus.Run:
-                            break;
-                        case TaskStatus.Exception:
-                            break;
-                        case TaskStatus.NotRun:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        // 检查是否需要重试任务
+                        var ts = t.NeedRetry();
+                        while (ts >= 0)
+                        {
+                            Thread.Sleep(ts * 1000);
+                            t.Excute();
+                            ts = t.NeedRetry();
+                        }
                     }
 
+                    // 判断是否有下一步执行任务
                     var next = t.GetNexTaskName();
                     if (string.IsNullOrEmpty(next))
                         return;
-                    else if (next == taskName)
-                    {
-                        t.Excute();
-                    }
-                    else
-                    {
-                        RunTask(next);
-                    }
+                    RunTask(next);
+                }
+                else
+                {
+                    MessageBox.Show(ymlPath + "不存在");
                 }
             }
             catch (Exception e)
             {
-                // TODO 记录异常
                 Console.WriteLine(e);
                 throw;
             }

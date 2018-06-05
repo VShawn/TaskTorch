@@ -110,8 +110,8 @@ namespace TaskTorch.WinTaskHelper
                             StartBoundary = DateTime.Now + TimeSpan.FromHours(1),
                             Enabled = false
                         },
-                        new ExecAction(runnerPath, scriptName, null), null, null, TaskLogonType.InteractiveToken,
-                        taskDescription);
+                        new ExecAction(runnerPath, scriptName, System.Environment.CurrentDirectory), null, null, TaskLogonType.InteractiveToken,
+                        nameof(TaskTorch) + ":" + taskDescription);
                 else
                     return ts.AddTask(taskName,
                         new TimeTrigger()
@@ -119,8 +119,8 @@ namespace TaskTorch.WinTaskHelper
                             StartBoundary = DateTime.Now + TimeSpan.FromHours(1),
                             Enabled = false
                         },
-                        new ExecAction(runnerPath, scriptName, null), userName, password,
-                        TaskLogonType.InteractiveTokenOrPassword, taskDescription);
+                        new ExecAction(runnerPath, scriptName, System.Environment.CurrentDirectory), userName, password,
+                        TaskLogonType.InteractiveTokenOrPassword, nameof(TaskTorch) + ":" + taskDescription);
             }
 
             return null;
@@ -153,14 +153,14 @@ namespace TaskTorch.WinTaskHelper
 
                 // Create a new task definition and assign properties
                 var td = ts.NewTask();
-                td.RegistrationInfo.Description = taskDescription;
+                td.RegistrationInfo.Description = nameof(TaskTorch) + ":" + taskDescription;
                 td.Principal.LogonType = TaskLogonType.InteractiveToken;
 
                 // Add a trigger
                 td.Triggers.Add(tigger);
 
                 // Add an action that will launch Notepad whenever the trigger fires
-                td.Actions.Add(new ExecAction(runnerPath, scriptName, null));
+                td.Actions.Add(new ExecAction(runnerPath, scriptName, System.Environment.CurrentDirectory));
 
 
                 if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))

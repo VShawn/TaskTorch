@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using SharpYaml.Serialization;
+using ServiceStack.OrmLite;
+using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
 
 namespace TaskTorch.Loader.Model
 {
@@ -9,47 +11,61 @@ namespace TaskTorch.Loader.Model
     {
         public TaskStatus Excute()
         {
-            string retInfo = string.Empty;
+            ExcuteInfos = new[] {"", ""};
             try
             {
                 switch (TaskType)
                 {
                     case TaskType.Cmd:
                     {
-                        retInfo = Runner.Runner.RunCmd(TaskCmd);
+                        ExcuteInfos = Runner.Runner.RunCmd(TaskCmd);
                         break;
                     }
                     case TaskType.Powershell:
                     {
-                        retInfo = Runner.Runner.RunCmd(TaskCmd);
+                        ExcuteInfos = Runner.Runner.RunCmd(TaskCmd);
                         break;
                     }
                     default:
                         throw new NotImplementedException("can not run with task type :" + TaskType);
                 }
 
-                if (string.IsNullOrEmpty(SuccessFlag))
+                // 若设定了命令运行正确的标志位，则根据标志位判断是否允许正确。
+                if (!string.IsNullOrEmpty(SuccessFlag))
                 {
-                    if (retInfo.IndexOf(SuccessFlag) >= 0)
-                    {
-                        return TaskStatus.Success;
-                    }
+                    // 先截取命令的输出文本
+                    if (ExcuteInfos[0].IndexOf(SuccessFlag) >= 0)
+                        TaskStatus = TaskStatus.Success;
                     else
-                    {
-                        return TaskStatus.Failure;
-                    }
+                        TaskStatus = TaskStatus.Failure;
                 }
                 else
                 {
-                    return TaskStatus.Run;
+                    // 获得命令执行的返回码，为0时表示允许正确
+                    if (int.TryParse(ExcuteInfos[1], out var result) && result == 0)
+                        TaskStatus = TaskStatus.Success;
+                    else
+                        TaskStatus = TaskStatus.Failure;
                 }
+                // 记录执行情况
+                AddLog();
             }
             catch (Exception e)
             {
-                // TODO 记录异常
+                // 记录异常
+                ExcuteInfos = new[] {e.Message, ""};
+                AddLog();
                 Console.WriteLine(e);
                 throw e;
             }
+            return TaskStatus;
+        }
+
+        public string GetExcuteInfo()
+        {
+            if (ExcuteInfos.Length > 0)
+                return ExcuteInfos[0];
+            return "";
         }
 
         public string ToYmlString()
@@ -59,21 +75,22 @@ namespace TaskTorch.Loader.Model
             {
                 Version = TaskV20180602.Version,
                 TaskName = TaskName,
-                TaskType = TaskType,
+                TaskType = TaskType.ToString(),
                 TaskDescription = TaskDescription,
                 TaskCmd = TaskCmd,
-                TimeOut = TimeOut,
+                TimeOut = TimeOut.ToString(),
                 SuccessFlag = SuccessFlag,
                 TaskAfterSuccess = TaskAfterSuccess,
                 TaskAfterFailure = TaskAfterFailure,
-                Retries = Retries,
-                RetryDelaySecond = RetryDelaySecond,
+                Retries = Retries.ToString(),
+                RetryDelaySecond = RetryDelaySecond.ToString(),
             });
             return yml;
         }
 
         public bool FromYmlString(string ymlString)
         {
+            TaskStatus = TaskStatus.NotRun;
             try
             {
                 var input = new StringReader(ymlString);
@@ -85,6 +102,7 @@ namespace TaskTorch.Loader.Model
                 TaskDescription = mapping.Children[new YamlScalarNode(nameof(TaskDescription))].ToString();
                 TaskCmd = mapping.Children[new YamlScalarNode(nameof(TaskCmd))].ToString();
                 TimeOut = int.Parse(mapping.Children[new YamlScalarNode(nameof(TimeOut))].ToString());
+                SuccessFlag = mapping.Children[new YamlScalarNode(nameof(SuccessFlag))].ToString();
                 TaskAfterSuccess = mapping.Children[new YamlScalarNode(nameof(TaskAfterSuccess))].ToString();
                 TaskAfterFailure = mapping.Children[new YamlScalarNode(nameof(TaskAfterFailure))].ToString();
                 Retries = int.Parse(mapping.Children[new YamlScalarNode(nameof(Retries))].ToString());
@@ -92,18 +110,15 @@ namespace TaskTorch.Loader.Model
             }
             catch (Exception e)
             {
+                TaskStatus = TaskStatus.NotRun;
+                ExcuteInfos = new[] { e.Message, "" };
+                AddLog();
                 Console.WriteLine(e);
                 return false;
             }
 
             TaskStatus = TaskStatus.NotRun;
             return true;
-
-            //var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
-            //foreach (var entry in mapping.Children)
-            //{
-            //    Console.WriteLine((YamlScalarNode)entry.Key.ToString() + " " + (YamlScalarNode)entry.Value.ToString());
-            //}
         }
 
         public string GetVersion()
@@ -111,21 +126,21 @@ namespace TaskTorch.Loader.Model
             return Version;
         }
 
+        public int NeedRetry()
+        {
+            if (TaskStatus != TaskStatus.Failure || Retries <= 0) return -1;
+            --Retries;
+            return RetryDelaySecond > 0 ? RetryDelaySecond : 0;
+        }
+
         public string GetNexTaskName()
         {
             switch (TaskStatus)
             {
                 case TaskStatus.Success:
-                case TaskStatus.Run:
                     return TaskAfterSuccess;
                 case TaskStatus.Failure:
                 case TaskStatus.Exception:
-                    if (Retries > 0)
-                    {
-                        --Retries;
-                        Thread.Sleep(RetryDelaySecond);
-                        return TaskName;
-                    }
                     return TaskAfterFailure;
                 case TaskStatus.NotRun:
                     break;
@@ -135,7 +150,47 @@ namespace TaskTorch.Loader.Model
             return string.Empty;
         }
 
+        public string GetTaskFolderPath()
+        {
+            return System.Environment.CurrentDirectory + "\\tasks\\" + TaskName;
+        }
+
+        public void AddLog()
+        {
+            if (Directory.Exists(GetTaskFolderPath()))
+            {
+                // 写数据库
+                var dbpath = GetTaskFolderPath() + "\\" + TaskName + ".db";
+                var dbFactory = new OrmLiteConnectionFactory(dbpath, SqliteDialect.Provider);
+                using (var db = dbFactory.Open())
+                {
+                    if(!db.TableExists(nameof(TaskRunLog)))
+                        db.CreateTable<TaskRunLog>();
+                    var trl = new TaskRunLog
+                    {
+                        Date = DateTime.Now,
+                        Msg = ExcuteInfos?[0],
+                        Statu = TaskStatus
+                    };
+                    db.Insert(trl);
+                }
+                // 写文件
+                var txtpath = GetTaskFolderPath() + "\\" + TaskName + ".log";
+                using (var sw = new StreamWriter(txtpath, true))
+                {
+                    var line = DateTime.Now.ToString("s") + "," + TaskStatus.ToString() + "," + ExcuteInfos?[0].Replace("\r", " ").Replace(",", " ").Replace("\n", " ") + "," +
+                               ExcuteInfos?[1];
+                    sw.WriteLine(line);
+                }
+            }
+        }
+
+
         public const string Version = "20180602";
+        public string[] ExcuteInfos { get; set; }
+        public TaskStatus TaskStatus { get; set; }
+
+
         public string TaskName { get; set; }
         public TaskType TaskType { get; set; }
         public string TaskDescription { get; set; }
@@ -146,9 +201,6 @@ namespace TaskTorch.Loader.Model
         public string TaskAfterFailure { get; set; }
         public int Retries { get; set; } = 0;
         public int RetryDelaySecond { get; set; } = 0;
-
-
-
-        public TaskStatus TaskStatus { get; set; }
     }
 }
+ 
