@@ -30,8 +30,16 @@ namespace TaskTorch.app
         {
             InitializeComponent();
             Grid.DataContext = this;
-
-            Init();
+            try
+            {
+                Init();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                MessageBox.Show(e.Message);
+                Close();
+            }
         }
 
 

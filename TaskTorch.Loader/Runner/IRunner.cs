@@ -75,7 +75,7 @@ namespace TaskTorch.Loader.Runner
             };
             //pro.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
             pro.Start();
-            pro.BeginOutputReadLine();
+            pro.StandardInput.WriteLine("powershell");
             pro.StandardInput.WriteLine(cmd);
             pro.StandardInput.WriteLine("echo $LASTEXITCODE");
             pro.StandardInput.WriteLine("exit");
@@ -88,12 +88,61 @@ namespace TaskTorch.Loader.Runner
             // 截取命令的输出文本
             var content = output.Substring(output.IndexOf(cmd + "\r\n") + (cmd + "\r\n").Length);
             content = content.Substring(0, content.IndexOf("echo $LASTEXITCODE\r\n"));
-            content = content.Substring(0, content.LastIndexOf("\r\n")).Trim(new[] { '\r', '\n', ' ' });
-
+            if (content.LastIndexOf("\r\n") >= 0)
+                content = content.Substring(0, content.LastIndexOf("\r\n")).Trim(new[] { '\r', '\n', ' ' });
+            else
+                content = "";
             // 获得命令执行的返回码，为0时表示允许正确
             var retCode = output.Substring(output.LastIndexOf("echo $LASTEXITCODE\r\n") + "echo $LASTEXITCODE\r\n".Length);
-            retCode = retCode.Substring(0, retCode.IndexOf("\r\n")).Trim(new[] {'\r', '\n', ' '});
+            if (retCode.IndexOf("\r\n") >= 0)
+                retCode = retCode.Substring(0, retCode.IndexOf("\r\n")).Trim(new[] { '\r', '\n', ' ' });
+            else
+                retCode = "9999";
+            if (!int.TryParse(retCode, out var i))
+                retCode = "9999";
             return new[] { content, retCode };
         }
+        //public static string[] RunPowershell(string cmd)
+        //{
+        //    var pro = new System.Diagnostics.Process
+        //    {
+        //        StartInfo =
+        //        {
+        //            FileName = "powershell.exe",
+        //            UseShellExecute = false,
+        //            RedirectStandardError = true,
+        //            RedirectStandardInput = true,
+        //            RedirectStandardOutput = true,
+        //            CreateNoWindow = true
+        //        }
+        //    };
+        //    //pro.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+        //    pro.Start();
+        //    pro.StandardInput.WriteLine(cmd);
+        //    pro.StandardInput.WriteLine("echo $LASTEXITCODE");
+        //    pro.StandardInput.WriteLine("exit");
+        //    pro.StandardInput.AutoFlush = true;
+        //    //获取cmd窗口的输出信息
+        //    var output = pro.StandardOutput.ReadToEnd();
+        //    pro.WaitForExit();//等待程序执行完退出进程
+        //    pro.Close();
+
+        //    // 截取命令的输出文本
+        //    var content = output.Substring(output.IndexOf(cmd + "\r\n") + (cmd + "\r\n").Length);
+        //    content = content.Substring(0, content.IndexOf("echo $LASTEXITCODE\r\n"));
+        //    if (content.LastIndexOf("\r\n") >= 0)
+        //        content = content.Substring(0, content.LastIndexOf("\r\n")).Trim(new[] {'\r', '\n', ' '});
+        //    else
+        //        content = "";
+        //    // 获得命令执行的返回码，为0时表示允许正确
+        //    var retCode = output.Substring(output.LastIndexOf("echo $LASTEXITCODE\r\n") + "echo $LASTEXITCODE\r\n".Length);
+        //    if (retCode.IndexOf("\r\n") >= 0)
+        //        retCode = retCode.Substring(0, retCode.IndexOf("\r\n")).Trim(new[] {'\r', '\n', ' '});
+        //    else
+        //        retCode = "9999";
+        //    if (!int.TryParse(retCode, out var i))
+        //        retCode = "9999";
+        //    return new[] { content, retCode };
+        //}
     }
 }
