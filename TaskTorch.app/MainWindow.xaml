@@ -4,30 +4,79 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TaskTorch.app"
+        xmlns:class="clr-namespace:TaskTorch.app.Class"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="600" Width="1000">
+    <Window.Resources>
+        <class:TaskRuningCountConverter x:Key="TaskRuningCountConverter" />
+        <class:TaskLastStatusConverter x:Key="TaskLastStatusConverter" />
+        <class:TaskLastRunTimeConverter x:Key="TaskLastRunTimeConverter" />
+        <class:TaskTiggerConverter x:Key="TaskTiggerConverter" />
+    </Window.Resources> 
+    <Grid Name="Grid">
         <StackPanel>
-            <ListBox ItemsSource="{Binding FileList}" Grid.Row="1" Height="300" Margin="0 5 0 0">
-                <ListBox.ItemTemplate >
-                    <DataTemplate >
-                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <Border Margin="5,1,5,1" Padding="3" BorderBrush="Green"  BorderThickness="1" CornerRadius="2">
-                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="300" ></ColumnDefinition>
-                                        <ColumnDefinition Width="Auto" ></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <Label Content="{Binding Name}"></Label>
-                                    <!--<Button Content="Open" Width="75" HorizontalAlignment="Left" Grid.Column="1" 
-                                            Click="BtnListBoxSelect_OnClick" ToolTip="{Binding Name}"
-                                    />-->
-                                </Grid>
-                            </Border>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <ListView Name="LvTaskList" ItemsSource="{Binding Tasks}" Height="500">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="任务名" Width="AUTO">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding TaskName}"  />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="指令" Width="AUTO">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding TaskCmd}"  />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="运行次数" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding TaskName,Converter={StaticResource TaskRuningCountConverter}}"  />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="上次运行状态" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding TaskName,Converter={StaticResource TaskLastStatusConverter}}"  />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="上次运行时间" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding TaskName,Converter={StaticResource TaskLastRunTimeConverter}}"  />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="触发器" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding TaskName,Converter={StaticResource TaskTiggerConverter}}"  />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="操作" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!--<Button>禁用</Button>
+                                        <Button>启用</Button>-->
+                                        <Button Click="BtnEditTask_OnClick" >编辑</Button>
+                                        <Button Click="BtnDeleteTask_OnClick">删除</Button>
+                                        <Button Click="BtnTestRunTask_OnClick">测试</Button>
+                                        <Button Click="BtnRunTask_OnClick">运行</Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
             <StackPanel Orientation="Horizontal">
                 <Button Name="BtnNewTask" Click="BtnNewTask_OnClick">New</Button>
             </StackPanel>

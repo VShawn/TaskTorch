@@ -24,5 +24,18 @@ namespace TaskTorch.Loader.Model
             }
             return null;
         }
+
+        public static ITask GetTask(string taskName)
+        {
+            var it = new TaskV20180602 {TaskName = taskName};
+            var path = it.GetTaskFolderPath();
+            var fpath = path + "\\" + taskName + ".yml";
+            if (!File.Exists(fpath))
+            {
+                return null;
+            }
+            var t = TaskSimpleFactory.CreateTask(File.ReadAllText(fpath));
+            return t;
+        }
     }
 }

@@ -15,7 +15,7 @@
             <StackPanel Orientation="Horizontal">
                 <Label>程序或脚本</Label>
                 <TextBox Width="200" Name="TbScriptPath"></TextBox>
-                <Button>...</Button>
+                <Button Click="BtnSelectScript_OnClick">...</Button>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label>描述</Label>
@@ -41,7 +41,22 @@
                 <Label>重试等待时间/s：</Label>
                 <TextBox Width="200" Name="TbRetryDelaySecond"></TextBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Label>用户未登陆时也执行脚本？</Label>
+                <CheckBox Name="CbRunWhenNoUser" Click="CbRunWhenNoUser_OnClick"></CheckBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <Label>windows登陆用户名</Label>
+                <TextBox Width="200" Name="TbUserName" IsEnabled="False"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label>登陆密码</Label>
+                <PasswordBox Width="200" Name="TbPass" IsEnabled="False"></PasswordBox>
+            </StackPanel>
+
+
             <Button Click="ButtonNext_OnClick">下一步（设置触发条件）</Button>
         </StackPanel>
     </Grid>

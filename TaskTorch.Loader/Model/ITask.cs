@@ -1,4 +1,6 @@
-﻿namespace TaskTorch.Loader.Model
+﻿using ServiceStack.OrmLite;
+
+namespace TaskTorch.Loader.Model
 {
     public interface ITask
     {
@@ -20,6 +22,8 @@
         string GetNexTaskName();
 
         string GetTaskFolderPath();
+
+        OrmLiteConnectionFactory GetDbFactory();
         void AddLog();
 
 
@@ -33,6 +37,8 @@
         TaskStatus TaskStatus { get; set; }
 
         string TaskName { get; set; }
+        string TaskCmd { get; set; }
+        string TaskDescription { get; set; }
         string[] ExcuteInfos { get; set; }
     }
 }

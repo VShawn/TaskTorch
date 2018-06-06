@@ -11,21 +11,21 @@ namespace TaskTorch.Loader.Model
     {
         public TaskStatus Excute()
         {
-            ExcuteInfos = new[] {"", ""};
+            ExcuteInfos = new[] { "", "" };
             try
             {
                 switch (TaskType)
                 {
                     case TaskType.Cmd:
-                    {
-                        ExcuteInfos = Runner.Runner.RunCmd(TaskCmd);
-                        break;
-                    }
+                        {
+                            ExcuteInfos = Runner.Runner.RunCmd(TaskCmd);
+                            break;
+                        }
                     case TaskType.Powershell:
-                    {
-                        ExcuteInfos = Runner.Runner.RunCmd(TaskCmd);
-                        break;
-                    }
+                        {
+                            ExcuteInfos = Runner.Runner.RunPowershell(TaskCmd);
+                            break;
+                        }
                     default:
                         throw new NotImplementedException("can not run with task type :" + TaskType);
                 }
@@ -53,7 +53,7 @@ namespace TaskTorch.Loader.Model
             catch (Exception e)
             {
                 // 记录异常
-                ExcuteInfos = new[] {e.Message, ""};
+                ExcuteInfos = new[] { e.Message, "" };
                 AddLog();
                 Console.WriteLine(e);
                 throw e;
@@ -63,7 +63,10 @@ namespace TaskTorch.Loader.Model
 
         public string GetExcuteInfo()
         {
-            if (ExcuteInfos.Length > 0)
+            if (ExcuteInfos?.Length > 0)
+                return ExcuteInfos[0];
+            Excute();
+            if (ExcuteInfos?.Length > 0)
                 return ExcuteInfos[0];
             return "";
         }
@@ -155,16 +158,21 @@ namespace TaskTorch.Loader.Model
             return System.Environment.CurrentDirectory + "\\tasks\\" + TaskName;
         }
 
+        public OrmLiteConnectionFactory GetDbFactory()
+        {
+            var dbpath = GetTaskFolderPath() + "\\" + TaskName + ".db";
+            var dbFactory = new OrmLiteConnectionFactory(dbpath, SqliteDialect.Provider);
+            return dbFactory;
+        }
         public void AddLog()
         {
             if (Directory.Exists(GetTaskFolderPath()))
             {
                 // 写数据库
                 var dbpath = GetTaskFolderPath() + "\\" + TaskName + ".db";
-                var dbFactory = new OrmLiteConnectionFactory(dbpath, SqliteDialect.Provider);
-                using (var db = dbFactory.Open())
+                using (var db = GetDbFactory().Open())
                 {
-                    if(!db.TableExists(nameof(TaskRunLog)))
+                    if (!db.TableExists(nameof(TaskRunLog)))
                         db.CreateTable<TaskRunLog>();
                     var trl = new TaskRunLog
                     {
@@ -203,4 +211,3 @@ namespace TaskTorch.Loader.Model
         public int RetryDelaySecond { get; set; } = 0;
     }
 }
- 
