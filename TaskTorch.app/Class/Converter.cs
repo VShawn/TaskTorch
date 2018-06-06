@@ -109,10 +109,10 @@ namespace TaskTorch.app.Class
             var task = WinTaskHelper.TaskHelper.GetTask(taskName);
             if (task == null)
                 return "null";
-            string ret = task.Definition.Principal.LogonType == TaskLogonType.InteractiveToken ?  "用户登录时：" : "无论是否登录：";
+            string ret = task.Definition.Principal.LogonType == TaskLogonType.InteractiveToken ?  "用户已登录且：" : "无论是否登录且：";
             foreach (var tigger in task.Definition.Triggers)
             {
-                ret += tigger.ToString() + " -> " + (tigger.Enabled ? ":Enabled" : "Disable") + ";";
+                ret += tigger.ToString() + " -> " + (tigger.Enabled ? "Enabled" : "Disable") + "; ";
             }
 
             return ret;

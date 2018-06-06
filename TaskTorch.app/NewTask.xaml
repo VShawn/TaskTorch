@@ -6,58 +6,105 @@
         xmlns:local="clr-namespace:TaskTorch.app"
         mc:Ignorable="d"
         Title="NewTask" Height="450" Width="800">
-    <Grid>
-        <StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label>任务名</Label>
-                <TextBox Width="200" Name="TbTaskName"></TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label>程序或脚本</Label>
-                <TextBox Width="200" Name="TbScriptPath"></TextBox>
+    <DockPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+
+
+            <Label Grid.Column="0" Grid.Row="0">任务名</Label>
+            <TextBox Grid.Column="1" Grid.Row="0" Name="TbTaskName"></TextBox>
+
+            <Label Grid.Column="0" Grid.Row="1">执行命令或脚本</Label>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1">
+                <TextBox Name="TbScriptPath" Width="500"></TextBox>
                 <Button Click="BtnSelectScript_OnClick">...</Button>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label>描述</Label>
-                <TextBox Width="200" Name="TbDescription"></TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label>反馈成功失败标志</Label>
-                <TextBox Width="200" Name="TbSuccessFlagString"></TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label>成功后执行任务：</Label>
-                <TextBox Width="200" Name="TbTaskAfterSuccess"></TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label>失败后执行任务：</Label>
-                <TextBox Width="200" Name="TbTaskAfterFailure"></TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label>失败后重试次数：</Label>
-                <TextBox Width="200" Name="TbRetries"></TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label>重试等待时间/s：</Label>
-                <TextBox Width="200" Name="TbRetryDelaySecond"></TextBox>
-            </StackPanel>
 
-            <StackPanel Orientation="Horizontal">
-                <Label>用户未登陆时也执行脚本？</Label>
-                <CheckBox Name="CbRunWhenNoUser" Click="CbRunWhenNoUser_OnClick"></CheckBox>
-            </StackPanel>
 
-            <StackPanel Orientation="Horizontal">
-                <Label>windows登陆用户名</Label>
-                <TextBox Width="200" Name="TbUserName" IsEnabled="False"></TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <Label Grid.Column="0" Grid.Row="2">任务描述</Label>
+            <TextBox Grid.Column="1" Grid.Row="2" Name="TbDescription"></TextBox>
+
+
+
+            <Label Grid.Column="0" Grid.Row="3">反馈成功标志</Label>
+            <TextBox Name="TbSuccessFlagString" Grid.Column="1" Grid.Row="3">
+                <TextBox.Resources>
+                    <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
+                        <VisualBrush.Visual>
+                            <TextBlock FontStyle="Italic" Text="为空时执行成功标志为校验控制台返回值，不为空时当脚本输出该字符串后认为执行成功"/>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </TextBox.Resources>
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="{x:Null}">
+                                <Setter Property="Background" Value="{StaticResource HintText}"/>
+                            </Trigger>
+                            <Trigger Property="Text" Value="">
+                                <Setter Property="Background" Value="{StaticResource HintText}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+
+            <Label Grid.Column="0" Grid.Row="4">成功后执行任务：</Label>
+            <TextBox Name="TbTaskAfterSuccess" Grid.Column="1" Grid.Row="4">
+                <TextBox.Resources>
+                    <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
+                        <VisualBrush.Visual>
+                            <TextBlock FontStyle="Italic" Text="输入任务名后，一旦脚本输出了成功标志，或返回值为0时，将继续执行任务。"/>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
+                </TextBox.Resources>
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="{x:Null}">
+                                <Setter Property="Background" Value="{StaticResource HintText}"/>
+                            </Trigger>
+                            <Trigger Property="Text" Value="">
+                                <Setter Property="Background" Value="{StaticResource HintText}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+
+            <Label Grid.Column="0" Grid.Row="5">失败后执行任务：</Label>
+            <TextBox Name="TbTaskAfterFailure" Grid.Column="1" Grid.Row="5"></TextBox>
+
+            <Label Grid.Column="0" Grid.Row="6">失败后重试次数：</Label>
+            <TextBox Name="TbRetries" Grid.Column="1" Grid.Row="6"></TextBox>
+
+            <Label Grid.Column="0" Grid.Row="7">重试等待时间/s：</Label>
+            <TextBox Name="TbRetryDelaySecond" Grid.Column="1" Grid.Row="7"></TextBox>
+
+            <Label Grid.Column="0" Grid.Row="8">用户未登陆时也执行脚本？</Label>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="8" VerticalAlignment="Center">
+                <CheckBox Name="CbRunWhenNoUser" Click="CbRunWhenNoUser_OnClick" VerticalAlignment="Center"></CheckBox>
+                <Label Margin="20 0 0 0">windows登陆用户名</Label>
+                <TextBox Name="TbUserName" IsEnabled="False" Width="200"></TextBox>
                 <Label>登陆密码</Label>
-                <PasswordBox Width="200" Name="TbPass" IsEnabled="False"></PasswordBox>
+                <PasswordBox Name="TbPass" IsEnabled="False" Width="200"></PasswordBox>
             </StackPanel>
-
-
-            <Button Click="ButtonNext_OnClick">下一步（设置触发条件）</Button>
-        </StackPanel>
-    </Grid>
+        </Grid>
+        <Button Click="ButtonNext_OnClick" DockPanel.Dock="Bottom" Height="30" Width="300">下一步（设置触发条件）</Button>
+    </DockPanel>
 </Window>

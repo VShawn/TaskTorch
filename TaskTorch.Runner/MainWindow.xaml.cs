@@ -15,6 +15,8 @@ namespace TaskTorch.Runner
         public MainWindow(string taskName)
         {
             InitializeComponent();
+            this.Visibility = Visibility.Hidden;
+            this.ShowInTaskbar = false;
             //RunCmd("ping 172.20.65.150");
             //RunPowershell("ping1 172.20.65.150");
             RunTask(taskName);

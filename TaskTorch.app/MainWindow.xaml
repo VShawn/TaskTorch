@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TaskTorch.app"
         xmlns:class="clr-namespace:TaskTorch.app.Class"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1000">
+        Title="Task List" Height="600" Width="1000">
     <Window.Resources>
         <class:TaskRuningCountConverter x:Key="TaskRuningCountConverter" />
         <class:TaskLastStatusConverter x:Key="TaskLastStatusConverter" />
@@ -15,9 +15,23 @@
     </Window.Resources> 
     <Grid Name="Grid">
         <StackPanel>
-            <ListView Name="LvTaskList" ItemsSource="{Binding Tasks}" Height="500">
+            <ListView Name="LvTaskList" ItemsSource="{Binding Tasks}" Height="Auto" MinHeight="400" MaxHeight="900" SelectionChanged="LvTaskList_OnSelectionChanged">
                 <ListView.View>
                     <GridView>
+                        <GridViewColumn Header="操作" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!--<Button>禁用</Button>
+                                        <Button>启用</Button>-->
+                                        <Button Click="BtnEditTask_OnClick" >编辑</Button>
+                                        <Button Click="BtnDeleteTask_OnClick">删除</Button>
+                                        <Button Click="BtnTestRunTask_OnClick">测试</Button>
+                                        <Button Click="BtnRunTask_OnClick">运行</Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Header="任务名" Width="AUTO">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -25,10 +39,10 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="指令" Width="AUTO">
+                        <GridViewColumn Header="描述" Width="AUTO">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Label Content="{Binding TaskCmd}"  />
+                                    <Label Content="{Binding TaskDescription}"  />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -60,25 +74,24 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="操作" >
+
+                        <GridViewColumn Header="指令" Width="AUTO">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <!--<Button>禁用</Button>
-                                        <Button>启用</Button>-->
-                                        <Button Click="BtnEditTask_OnClick" >编辑</Button>
-                                        <Button Click="BtnDeleteTask_OnClick">删除</Button>
-                                        <Button Click="BtnTestRunTask_OnClick">测试</Button>
-                                        <Button Click="BtnRunTask_OnClick">运行</Button>
-                                    </StackPanel>
+                                    <Label Content="{Binding TaskCmd}"  />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                     </GridView>
                 </ListView.View>
             </ListView>
-            <StackPanel Orientation="Horizontal">
-                <Button Name="BtnNewTask" Click="BtnNewTask_OnClick">New</Button>
+
+            <StackPanel Margin="10 0">
+                <Label>详细信息</Label>
+                <TextBlock Name="TbTaskDetial">...</TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Center">
+                <Button Name="BtnNewTask" Click="BtnNewTask_OnClick">建立新的任务计划</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

@@ -164,5 +164,11 @@ namespace TaskTorch.app
             }
             Init();
         }
+
+        private void LvTaskList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var t = LvTaskList.SelectedItem as ITask;
+            TbTaskDetial.Text = t?.GetDetail() ?? "...";
+        }
     }
 }

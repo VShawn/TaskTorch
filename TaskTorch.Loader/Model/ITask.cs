@@ -4,10 +4,16 @@ namespace TaskTorch.Loader.Model
 {
     public interface ITask
     {
+        /// <summary>
+        /// 执行任务
+        /// </summary>
+        /// <returns></returns>
         TaskStatus Excute();
+        /// <summary>
+        /// 返回任务上一次的执行输出信息
+        /// </summary>
+        /// <returns></returns>
         string GetExcuteInfo();
-        string ToYmlString();
-        bool FromYmlString(string ymlString);
         string GetVersion();
         /// <summary>
         /// 检查任务是否需要重试，并返回重试的延时时间（秒）
@@ -23,11 +29,25 @@ namespace TaskTorch.Loader.Model
 
         string GetTaskFolderPath();
 
+        /// <summary>
+        /// 获取任务详细的描述信息
+        /// </summary>
+        /// <returns></returns>
+        string GetDetail();
+
+        /// <summary>
+        /// 获得该任务的数据库连接
+        /// </summary>
+        /// <returns></returns>
         OrmLiteConnectionFactory GetDbFactory();
+        /// <summary>
+        /// 将上一次的执行状态记录到数据库和log文件
+        /// </summary>
         void AddLog();
 
 
-
+        string ToYmlString();
+        bool FromYmlString(string ymlString);
 
 
 

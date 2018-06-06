@@ -158,6 +158,16 @@ namespace TaskTorch.Loader.Model
             return System.Environment.CurrentDirectory + "\\tasks\\" + TaskName;
         }
 
+        public string GetDetail()
+        {
+            string ret = @"
+任务名 = " + TaskName + @", 描述 = " + TaskDescription + @", 超时时间/秒 = " + TimeOut + @", 失败后重试次数 = " + Retries + @", 重试推延执行时间/秒 = " + RetryDelaySecond + @",
+任务成功标志 = " + (SuccessFlag == "" ? "[cmd return 0]" : "[cmd output: “" + SuccessFlag + "”]") + @",
+若任务成功则执行 = " + (TaskAfterSuccess == "" ? "null" : TaskAfterSuccess) + @", 任务失败则执行= " + (TaskAfterSuccess == "" ? "null" : TaskAfterSuccess) + @",
+";
+            return ret;
+        }
+
         public OrmLiteConnectionFactory GetDbFactory()
         {
             var dbpath = GetTaskFolderPath() + "\\" + TaskName + ".db";
