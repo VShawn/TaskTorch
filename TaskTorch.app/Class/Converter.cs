@@ -105,11 +105,39 @@ namespace TaskTorch.app.Class
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string taskName = value.ToString();
+            var taskName = value?.ToString();
+            if (string.IsNullOrEmpty(taskName))
+                return "null";
             var task = WinTaskHelper.TaskHelper.GetTask(taskName);
             if (task == null)
+                task = WinTaskHelper.TaskHelper.GetTmpTask(taskName);
+            if (task == null)
                 return "null";
-            string ret = task.Definition.Principal.LogonType == TaskLogonType.InteractiveToken ?  "用户已登录且：" : "无论是否登录且：";
+            var ret = task.Definition.Principal.LogonType == TaskLogonType.InteractiveToken ? "用户已登录且：" : "无论是否登录且：";
+            foreach (var tigger in task.Definition.Triggers)
+            {
+                ret += tigger.ToString() + " -> " + (tigger.Enabled ? "Enabled" : "Disable") + "; ";
+            }
+            return ret;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    [ValueConversion(typeof(string), typeof(string))]
+    public class TmpTaskTiggerConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var taskName = value?.ToString();
+            if (string.IsNullOrEmpty(taskName))
+                return "null";
+            var task = WinTaskHelper.TaskHelper.GetTmpTask(taskName);
+            if (task == null)
+                return "null";
+            var ret = task.Definition.Principal.LogonType == TaskLogonType.InteractiveToken ? "用户已登录且：" : "无论是否登录且：";
             foreach (var tigger in task.Definition.Triggers)
             {
                 ret += tigger.ToString() + " -> " + (tigger.Enabled ? "Enabled" : "Disable") + "; ";

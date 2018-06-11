@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using ServiceStack.OrmLite;
@@ -7,8 +8,9 @@ using YamlDotNet.Serialization;
 
 namespace TaskTorch.Loader.Model
 {
-    public class TaskV20180602 : ITask
+    public class TaskV20180602 : ITask, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
         public TaskStatus Excute()
         {
             ExcuteInfos = new[] { "", "" };
@@ -209,14 +211,14 @@ namespace TaskTorch.Loader.Model
         public TaskStatus TaskStatus { get; set; }
 
 
-        public string TaskName { get; set; }
+        public string TaskName { get; set; } = "";
         public TaskType TaskType { get; set; }
-        public string TaskDescription { get; set; }
-        public string TaskCmd { get; set; }
+        public string TaskDescription { get; set; } = "";
+        public string TaskCmd { get; set; } = "";
         public int TimeOut { get; set; } = 0;
-        public string SuccessFlag { get; set; }
-        public string TaskAfterSuccess { get; set; }
-        public string TaskAfterFailure { get; set; }
+        public string SuccessFlag { get; set; } = "";
+        public string TaskAfterSuccess { get; set; } = "";
+        public string TaskAfterFailure { get; set; } = "";
         public int Retries { get; set; } = 0;
         public int RetryDelaySecond { get; set; } = 0;
     }

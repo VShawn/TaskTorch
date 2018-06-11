@@ -1,9 +1,11 @@
-﻿using ServiceStack.OrmLite;
+﻿using System.ComponentModel;
+using ServiceStack.OrmLite;
 
 namespace TaskTorch.Loader.Model
 {
-    public interface ITask
+    public interface ITask : INotifyPropertyChanged
     {
+        event PropertyChangedEventHandler PropertyChanged;
         /// <summary>
         /// 执行任务
         /// </summary>
