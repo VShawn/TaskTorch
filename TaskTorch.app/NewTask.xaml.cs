@@ -98,11 +98,16 @@ namespace TaskTorch.app
                 // make cmd
                 if (File.Exists(TbScriptPath.Text))
                 {
-                    FileInfo fi = new FileInfo(TbScriptPath.Text);
-                    if (fi.Extension == ".ps1")
-                        t.TaskType = TaskType.Powershell;
-                    else if (fi.Extension == ".py")
-                        t.TaskCmd = "python " + t.TaskCmd;
+                    var fi = new FileInfo(TbScriptPath.Text);
+                    switch (fi.Extension)
+                    {
+                        case ".ps1":
+                            t.TaskType = TaskType.Powershell;
+                            break;
+                        case ".py":
+                            t.TaskCmd = "python " + t.TaskCmd;
+                            break;
+                    }
                 }
 
                 // Get the service on the local machine

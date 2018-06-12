@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using YamlDotNet.RepresentationModel;
 
 namespace TaskTorch.Loader.Model
@@ -20,6 +21,10 @@ namespace TaskTorch.Loader.Model
                     var task = new TaskV20180602();
                     if (task.FromYmlString(ymlString))
                         return task;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException("no version match");
                 }
             }
             return null;

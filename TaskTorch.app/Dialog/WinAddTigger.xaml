@@ -1,0 +1,28 @@
+﻿<Window x:Class="TaskTorch.app.Dialog.WinAddTigger"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TaskTorch.app.Dialog"
+        mc:Ignorable="d"
+        Title="AddTigger" Height="150" Width="400" Loaded="WinAddTigger_OnLoaded">
+    <Grid>
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Label Grid.Column="0" Grid.Row="8">用户未登陆时也执行脚本？</Label>
+                <CheckBox Name="CbRunWhenNoUser" Click="CbRunWhenNoUser_OnClick" VerticalAlignment="Center"></CheckBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Label Margin="20 0 14 0">windows登陆用户名</Label>
+                <TextBox Name="TbUserName" IsEnabled="False" Width="200"></TextBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Label Margin="20 0 76 0">登陆密码</Label>
+                <PasswordBox Name="TbPass" IsEnabled="False" Width="200"></PasswordBox>
+            </StackPanel>
+            <Button Width="200" Margin="0 10 0 0" Click="ButtonBase_OnClick">下一步</Button>
+        </StackPanel>
+    </Grid>
+</Window>
