@@ -12,13 +12,13 @@
     </Window.Resources> 
     <Grid Name="Grid">
         <Frame Grid.Column="0" Grid.Row="0"
-               Name="FrameTaskList" Source="/Frame/PageTaskList.xaml"
+               Name="FrameTaskList" 
                Margin="5" NavigationUIVisibility="Hidden"
                VerticalAlignment="Stretch"
                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                Panel.ZIndex="99" Focusable="False" Visibility="{Binding Source={x:Static presentercs:MainPresenter.Instance},Path=ShowTaskListPage}"/>
         <Frame Grid.Column="0" Grid.Row="0"
-               Name="FrameAddTask" Source="/Frame/PageAddTask.xaml"
+               Name="FrameAddTask" 
                Margin="5" NavigationUIVisibility="Hidden"
                VerticalAlignment="Stretch"
                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"

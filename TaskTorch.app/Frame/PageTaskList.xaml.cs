@@ -26,6 +26,7 @@ namespace TaskTorch.app.Frame
     public partial class PageTaskList : Page, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        private readonly System.Timers.Timer _timer;
 
         public PageTaskList()
         {
@@ -40,6 +41,11 @@ namespace TaskTorch.app.Frame
                 Console.WriteLine(e);
                 MessageBox.Show(e.Message);
             }
+
+            _timer = new System.Timers.Timer(10000);
+            _timer.Elapsed += (sender, args) => { Dispatcher.Invoke(callback: () => { Init(); }); };
+            _timer.Interval = 1000 * 60 * 10;
+            _timer.Enabled = true;
         }
 
 
@@ -82,7 +88,7 @@ namespace TaskTorch.app.Frame
         {
             AddTaskPresenter.Instance.IsEditMode = false;
             MainPresenter.Instance.ShowPage(MainPresenter.MainPage.AddTask);
-            Init();
+            //Init();
         }
 
         private void BtnEditTask_OnClick(object sender, RoutedEventArgs e)

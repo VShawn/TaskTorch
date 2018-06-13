@@ -52,6 +52,7 @@ namespace TaskTorch.app.Presenter
             {
                 case MainPage.TaskList:
                     ShowTaskListPage = Visibility.Visible;
+                    App.Window?.PageTaskList?.Init();
                     break;
                 case MainPage.AddTask:
                     ShowAddTaskPage = Visibility.Visible;
