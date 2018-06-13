@@ -7,7 +7,7 @@
         xmlns:class="clr-namespace:TaskTorch.app.Class"
         xmlns:presentercs="clr-namespace:TaskTorch.app.Presenter"
         mc:Ignorable="d"
-        Title="Task List" Height="600" Width="1000">
+        Title="Task List" Height="600" Width="1000" Closed="MainWindow_OnClosed">
     <Window.Resources>
     </Window.Resources> 
     <Grid Name="Grid">

@@ -20,8 +20,13 @@ namespace TaskTorch.app
         {
             InitializeComponent();
             Grid.DataContext = this;
-
+            WinTaskHelper.TaskHelper.DeleteAllTmpTask();
             MainPresenter.Instance.ShowPage(MainPresenter.MainPage.TaskList);
+        }
+
+        private void MainWindow_OnClosed(object sender, EventArgs e)
+        {
+            WinTaskHelper.TaskHelper.DeleteAllTmpTask();
         }
     }
 }

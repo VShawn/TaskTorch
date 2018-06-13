@@ -28,10 +28,8 @@ namespace TaskTorch.app.Frame
     public partial class PageAddTask : Page, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public bool IsEdit { get; set; }= false;
         public PageAddTask()
         {
-            IsEdit = false;
             InitializeComponent();
             Grid.DataContext = this;
         }
@@ -42,7 +40,7 @@ namespace TaskTorch.app.Frame
             {
                 Task = AddTaskPresenter.Instance.Task,
                 IsEditMode = AddTaskPresenter.Instance.IsEditMode,
-                TmpTaskName = DateTime.Now.ToString("yyyyMMdd_hhmmss.fff"),
+                TmpTaskName = DateTime.Now.ToString("yyyyMMdd_hhmmss_fff"),
                 UserName = AddTaskPresenter.Instance.UserName,
                 Password = AddTaskPresenter.Instance.Password,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
@@ -93,7 +91,7 @@ namespace TaskTorch.app.Frame
             {
                 Console.WriteLine(exception);
 
-                if (Directory.Exists(AddTaskPresenter.Instance.Task.GetTaskFolderPath()) && !IsEdit)
+                if (Directory.Exists(AddTaskPresenter.Instance.Task.GetTaskFolderPath()) && !AddTaskPresenter.Instance.IsEditMode)
                     Directory.Delete(AddTaskPresenter.Instance.Task.GetTaskFolderPath(), true);
                 MessageBox.Show(exception.Message);
             }
@@ -101,6 +99,8 @@ namespace TaskTorch.app.Frame
 
         private void BtnCancel_OnClick(object sender, RoutedEventArgs e)
         {
+            WinTaskHelper.TaskHelper.DeleteAllTmpTask();
+            AddTaskPresenter.Instance.Task = new TaskV20180602();
             MainPresenter.Instance.ShowPage(MainPresenter.MainPage.TaskList);
         }
     }

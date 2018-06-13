@@ -107,11 +107,13 @@ namespace TaskTorch.app.Dialog
                         AvailableTabs = AvailableTaskTabs.General | AvailableTaskTabs.Triggers |
                                         AvailableTaskTabs.Conditions | AvailableTaskTabs.Settings |
                                         AvailableTaskTabs.Properties,
-                        RegisterTaskOnAccept = false
+                        RegisterTaskOnAccept = false,
                     };
                     editorForm.Initialize(task);
                     if (editorForm.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
+                        WinTaskHelper.TaskHelper.DeleteTmpTask(TmpTaskName);
+                        WinTaskHelper.TaskHelper.AddTmpTask(TmpTaskName, task, TbUserName.Text, TbPass.Password);
                         // save psw of windows
                         if (!string.IsNullOrEmpty(TbPass.Password) && !string.IsNullOrEmpty(TbUserName.Text))
                         {
@@ -125,7 +127,7 @@ namespace TaskTorch.app.Dialog
                     else
                     {
                         // cancel or failed -> delete
-                        WinTaskHelper.TaskHelper.DeleteTmpTask(TmpTaskName);
+                        WinTaskHelper.TaskHelper.DeleteAllTmpTask();
                         this.Result = false;
                         Close();
                         return;

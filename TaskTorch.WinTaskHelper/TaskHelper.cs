@@ -173,11 +173,49 @@ namespace TaskTorch.WinTaskHelper
                         new ExecAction(runnerPath, scriptName, System.Environment.CurrentDirectory), null, null,
                         TaskLogonType.InteractiveToken,
                         nameof(TaskTorch) + ":" + taskDescription);
-                    t.Definition.Triggers.Clear();
                     foreach (var trigger in triggers)
                     {
-                        t.Definition.Triggers.Add(trigger);
+                        switch (trigger)
+                        {
+                            case TimeTrigger _:
+                                t.Definition.Triggers.Add((TimeTrigger)trigger.Clone());
+                                break;
+                            case DailyTrigger _:
+                                t.Definition.Triggers.Add((DailyTrigger)trigger.Clone());
+                                break;
+                            case WeeklyTrigger _:
+                                t.Definition.Triggers.Add((MonthlyTrigger)trigger.Clone());
+                                break;
+                            case MonthlyDOWTrigger _:
+                                t.Definition.Triggers.Add((MonthlyDOWTrigger)trigger.Clone());
+                                break;
+                            case MonthlyTrigger _:
+                                t.Definition.Triggers.Add((MonthlyTrigger)trigger.Clone());
+                                break;
+                            case CustomTrigger _:
+                                t.Definition.Triggers.Add((CustomTrigger)trigger.Clone());
+                                break;
+                            case EventTrigger _:
+                                t.Definition.Triggers.Add((EventTrigger)trigger.Clone());
+                                break;
+                            case BootTrigger _:
+                                t.Definition.Triggers.Add((BootTrigger)trigger.Clone());
+                                break;
+                            case IdleTrigger _:
+                                t.Definition.Triggers.Add((IdleTrigger)trigger.Clone());
+                                break;
+                            case LogonTrigger _:
+                                t.Definition.Triggers.Add((LogonTrigger)trigger.Clone());
+                                break;
+                            case RegistrationTrigger _:
+                                t.Definition.Triggers.Add((RegistrationTrigger)trigger.Clone());
+                                break;
+                            default :
+                                t.Definition.Triggers.Add(trigger);
+                                break;
+                        }
                     }
+                    t.Definition.Triggers.RemoveAt(0);
                     return t;
                 }
                 else
@@ -191,14 +229,81 @@ namespace TaskTorch.WinTaskHelper
                         new ExecAction(runnerPath, scriptName, System.Environment.CurrentDirectory), userName, password,
                         TaskLogonType.InteractiveTokenOrPassword, nameof(TaskTorch) + ":" + taskDescription);
                     t.Definition.Triggers.Clear();
+
                     foreach (var trigger in triggers)
                     {
-                        t.Definition.Triggers.Add(trigger);
+                        switch (trigger)
+                        {
+                            case TimeTrigger _:
+                                t.Definition.Triggers.Add((TimeTrigger)trigger.Clone());
+                                break;
+                            case DailyTrigger _:
+                                t.Definition.Triggers.Add((DailyTrigger)trigger.Clone());
+                                break;
+                            case WeeklyTrigger _:
+                                t.Definition.Triggers.Add((MonthlyTrigger)trigger.Clone());
+                                break;
+                            case MonthlyDOWTrigger _:
+                                t.Definition.Triggers.Add((MonthlyDOWTrigger)trigger.Clone());
+                                break;
+                            case MonthlyTrigger _:
+                                t.Definition.Triggers.Add((MonthlyTrigger)trigger.Clone());
+                                break;
+                            case CustomTrigger _:
+                                t.Definition.Triggers.Add((CustomTrigger)trigger.Clone());
+                                break;
+                            case EventTrigger _:
+                                t.Definition.Triggers.Add((EventTrigger)trigger.Clone());
+                                break;
+                            case BootTrigger _:
+                                t.Definition.Triggers.Add((BootTrigger)trigger.Clone());
+                                break;
+                            case IdleTrigger _:
+                                t.Definition.Triggers.Add((IdleTrigger)trigger.Clone());
+                                break;
+                            case LogonTrigger _:
+                                t.Definition.Triggers.Add((LogonTrigger)trigger.Clone());
+                                break;
+                            case RegistrationTrigger _:
+                                t.Definition.Triggers.Add((RegistrationTrigger)trigger.Clone());
+                                break;
+                            default:
+                                t.Definition.Triggers.Add(trigger);
+                                break;
+                        }
                     }
                     return t;
                 }
             }
         }
+
+
+
+        public static Task AddTmpTask(string taskName, Task t, string userName = "", string password = "")
+        {
+            // 检查runner是否存在
+            var runnerPath = System.Environment.CurrentDirectory + @"\" + nameof(TaskTorch) + "." + "Runner" + ".exe";
+            if (!File.Exists(runnerPath))
+                throw new FileNotFoundException("Runner.exe not existed: " + ExePath, runnerPath);
+
+            taskName = GetTaskFolderName() + "_TmpTask_" + taskName;
+
+            // check 
+            if (TaskExists(taskName))
+                return null;
+            using (var ts = new TaskService())
+            {
+                var tf = ts.RootFolder;
+
+                if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+                    return tf.RegisterTaskDefinition(taskName, t.Definition);
+                else
+                    return tf.RegisterTaskDefinition(taskName, t.Definition, TaskCreation.Create, userName, password,
+                        TaskLogonType.InteractiveTokenOrPassword);
+            }
+        }
+
+
         ///// <summary>
         ///// add a task in windows task scheduler for this app
         ///// </summary>
