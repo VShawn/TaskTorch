@@ -91,9 +91,6 @@
                 <Label>详细信息</Label>
                 <TextBlock Name="TbTaskDetial">...</TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Height="30" HorizontalAlignment="Center">
-                <Button Name="BtnNewTask" Click="BtnNewTask_OnClick">建立新的任务计划</Button>
-            </StackPanel>
         </StackPanel>
     </Grid>
 </Page>

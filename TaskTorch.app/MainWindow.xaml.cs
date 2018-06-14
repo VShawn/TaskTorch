@@ -29,12 +29,24 @@ namespace TaskTorch.app
             FrameAddTask.Navigate(PageAddTask);
 
             MainPresenter.Instance.ShowPage(MainPresenter.MainPage.TaskList);
+            this.Closed += (sender, args) => { WinTaskHelper.TaskHelper.DeleteAllTmpTask(); };
 
         }
 
-        private void MainWindow_OnClosed(object sender, EventArgs e)
+        private void BtnTaskList_OnClick(object sender, RoutedEventArgs e)
         {
-            WinTaskHelper.TaskHelper.DeleteAllTmpTask();
+            AddTaskPresenter.Instance.IsEditMode = false;
+            MainPresenter.Instance.ShowPage(MainPresenter.MainPage.TaskList);
+        }
+        private void BtnNewTask_OnClick(object sender, RoutedEventArgs e)
+        {
+            AddTaskPresenter.Instance.IsEditMode = false;
+            MainPresenter.Instance.ShowPage(MainPresenter.MainPage.AddTask);
+        }
+        private void BtnScript_OnClick(object sender, RoutedEventArgs e)
+        {
+            AddTaskPresenter.Instance.IsEditMode = false;
+            MainPresenter.Instance.ShowPage(MainPresenter.MainPage.ScriptEnvironment);
         }
     }
 }

@@ -100,6 +100,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Frame\PageScriptEnvironments.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Frame\PageTaskList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -120,6 +124,9 @@
     <Compile Include="Frame\PageAddTask.xaml.cs">
       <DependentUpon>PageAddTask.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Frame\PageScriptEnvironments.xaml.cs">
+      <DependentUpon>PageScriptEnvironments.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Frame\PageTaskList.xaml.cs">
       <DependentUpon>PageTaskList.xaml</DependentUpon>
     </Compile>
@@ -131,6 +138,7 @@
   <ItemGroup>
     <Compile Include="Presenter\AddTaskPresenter.cs" />
     <Compile Include="Presenter\MainPresenter.cs" />
+    <Compile Include="Presenter\ScriptEnvironmentsPresenter.cs" />
     <Compile Include="Presenter\TaskLitsPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

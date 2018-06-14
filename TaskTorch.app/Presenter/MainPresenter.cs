@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace TaskTorch.app.Presenter
 {
-    public class MainPresenter: INotifyPropertyChanged
+    public class MainPresenter : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -36,18 +36,20 @@ namespace TaskTorch.app.Presenter
         #endregion
 
 
-        public Visibility ShowTaskListPage { get;private set; } = Visibility.Collapsed;
+        public Visibility ShowTaskListPage { get; private set; } = Visibility.Collapsed;
         public Visibility ShowAddTaskPage { get; private set; } = Visibility.Collapsed;
+        public Visibility ShowScriptEnvironmentsPage { get; private set; } = Visibility.Collapsed;
 
 
         public enum MainPage
         {
             TaskList,
             AddTask,
+            ScriptEnvironment,
         }
         public void ShowPage(MainPage p)
         {
-            ShowTaskListPage = ShowAddTaskPage = Visibility.Collapsed;
+            ShowScriptEnvironmentsPage = ShowTaskListPage = ShowAddTaskPage = Visibility.Collapsed;
             switch (p)
             {
                 case MainPage.TaskList:
@@ -56,6 +58,9 @@ namespace TaskTorch.app.Presenter
                     break;
                 case MainPage.AddTask:
                     ShowAddTaskPage = Visibility.Visible;
+                    break;
+                case MainPage.ScriptEnvironment:
+                    ShowScriptEnvironmentsPage = Visibility.Visible;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(p), p, null);

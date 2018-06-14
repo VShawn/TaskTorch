@@ -7,11 +7,17 @@
         xmlns:class="clr-namespace:TaskTorch.app.Class"
         xmlns:presentercs="clr-namespace:TaskTorch.app.Presenter"
         mc:Ignorable="d"
-        Title="Task List" Height="600" Width="1000" Closed="MainWindow_OnClosed">
+        Title="Task List" Height="600" Width="1000">
     <Window.Resources>
     </Window.Resources> 
     <Grid Name="Grid">
-        <Frame Grid.Column="0" Grid.Row="0"
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Height="50">
+                <Button Click="BtnTaskList_OnClick" Height="30" Margin="5" Padding="5">任务计划列表</Button>
+                <Button Click="BtnNewTask_OnClick" Height="30" Margin="5" Padding="5">建立新的任务计划</Button>
+                <Button Click="BtnScript_OnClick" Height="30" Margin="5" Padding="5">编辑脚本环境</Button>
+            </StackPanel>
+            <Frame Grid.Column="0" Grid.Row="0"
                Name="FrameTaskList" 
                Margin="5" NavigationUIVisibility="Hidden"
                VerticalAlignment="Stretch"
@@ -23,5 +29,13 @@
                VerticalAlignment="Stretch"
                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                Panel.ZIndex="99" Focusable="False" Visibility="{Binding Source={x:Static presentercs:MainPresenter.Instance},Path=ShowAddTaskPage}"/>
+
+            <Frame Grid.Column="0" Grid.Row="0"
+                   Name="FrameScriptEnvironments" Source="Frame/PageScriptEnvironments.xaml"
+                   Margin="5" NavigationUIVisibility="Hidden"
+                   VerticalAlignment="Stretch"
+                   HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                   Panel.ZIndex="99" Focusable="False" Visibility="{Binding Source={x:Static presentercs:MainPresenter.Instance},Path=ShowScriptEnvironmentsPage}"/>
+        </StackPanel>
     </Grid>
 </Window>

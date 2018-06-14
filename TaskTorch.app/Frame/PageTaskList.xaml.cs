@@ -79,18 +79,6 @@ namespace TaskTorch.app.Frame
             LvTaskList.Items.Refresh();
         }
 
-        /// <summary>
-        /// open new window to create new TaskTorch task
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BtnNewTask_OnClick(object sender, RoutedEventArgs e)
-        {
-            AddTaskPresenter.Instance.IsEditMode = false;
-            MainPresenter.Instance.ShowPage(MainPresenter.MainPage.AddTask);
-            //Init();
-        }
-
         private void BtnEditTask_OnClick(object sender, RoutedEventArgs e)
         {
             var curItem = ((ListBoxItem)LvTaskList.ContainerFromElement((Button)sender)).Content;

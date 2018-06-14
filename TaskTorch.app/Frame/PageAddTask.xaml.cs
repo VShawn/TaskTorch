@@ -103,5 +103,26 @@ namespace TaskTorch.app.Frame
             AddTaskPresenter.Instance.Task = new TaskV20180602();
             MainPresenter.Instance.ShowPage(MainPresenter.MainPage.TaskList);
         }
+
+
+        private void BtnSelectScript_OnClick(object sender, RoutedEventArgs e)
+        {
+            var fi = FileHelper.OpenFile();
+            if (fi != null)
+            {
+                foreach (var script in ScriptEnvironmentsPresenter.Instance.Scripts)
+                {
+                    if (script.Extension == fi.Extension)
+                    {
+                        AddTaskPresenter.Instance.Task.TaskCmd =
+                            script.CmdTemplate.Replace(ScriptEnvironmentsPresenter.SCRIPT_NAME,
+                                fi.FullName.Replace(fi.Extension, ""));
+                        return;
+                    }
+                }
+
+                MessageBox.Show("无法继续：程序中未存储 " + fi.Extension + " 文件的执行方式。");
+            }
+        }
     }
 }
