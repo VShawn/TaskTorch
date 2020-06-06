@@ -6,10 +6,21 @@
         xmlns:local="clr-namespace:TaskTorch.app"
         xmlns:class="clr-namespace:TaskTorch.app.Class"
         xmlns:presentercs="clr-namespace:TaskTorch.app.Presenter"
+        xmlns:themes="clr-namespace:Walterlv.Themes"
         mc:Ignorable="d"
-        Title="Task List" Height="600" Width="1000">
+        Title="Task List" Height="600" Width="1000"
+        WindowStyle="None"
+        Style="{StaticResource Style.Window.Universal}"
+        Background="#279dd9"
+        BorderBrush="Transparent"
+        >
+    <themes:UniversalWindowStyle.TitleBar>
+        <themes:UniversalTitleBar ForegroundColor="White" InactiveForegroundColor="#87c9ea"
+                                  ButtonHoverForeground="White" ButtonHoverBackground="#87c9ea"
+                                  ButtonPressedForeground="#86c9ea" ButtonPressedBackground="Red" />
+    </themes:UniversalWindowStyle.TitleBar>
     <Window.Resources>
-    </Window.Resources> 
+    </Window.Resources>
     <Grid Name="Grid">
         <StackPanel>
             <StackPanel Orientation="Horizontal" Height="50">
@@ -23,7 +34,7 @@
                VerticalAlignment="Stretch"
                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                Panel.ZIndex="99" Focusable="False" Visibility="{Binding Source={x:Static presentercs:MainPresenter.Instance},Path=ShowTaskListPage}"/>
-        <Frame Grid.Column="0" Grid.Row="0"
+            <Frame Grid.Column="0" Grid.Row="0"
                Name="FrameAddTask" 
                Margin="5" NavigationUIVisibility="Hidden"
                VerticalAlignment="Stretch"

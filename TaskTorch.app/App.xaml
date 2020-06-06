@@ -4,5 +4,10 @@
              xmlns:local="clr-namespace:TaskTorch.app"
              Startup="ApplicationStart">
     <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resourse/Style/Window.Universal.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
